@@ -139,7 +139,7 @@ st.markdown(
 
     .subtitle, .etiqueta, [class*="st-key-tarjeta"] {{
         background: none !important;
-        border-style: solid "important;
+        border-style: solid !important;
         border-image-width: 32px;
         border-color: transparent !important;
         border-image-source: url("data:image/png;base64,{caja}") !important;
@@ -203,6 +203,39 @@ st.markdown(
         color: #1B2A4A;
     }}
 
+    [data-testid="InputInstructions"] {{
+        display: none !important;
+    }}
+
+    /* Logros, y más adelante Configuración, etc. */
+    [class*="st-key-btn_icono"] button {{
+        padding: 0.3rem 0;
+        min-height: 2.6rem;
+        font-size: 1.3rem;
+    }}
+ 
+    /* Ventana de Logros */
+    div[data-testid="stDialog"] div[role="dialog"] {{
+        background-color: #0B0615;
+        border: 3px solid #05A887;
+        border-radius: 10px;
+        max-height: 80vh;
+        overflow-y: auto;      /* solo se desplaza la ventana */
+    }}
+    div[data-testid="stDialog"] div[role="dialog"] * {{
+        font-family: 'Pixelazurebonds', sans-serif !important;
+        color: #05A887;
+    }}
+    div[data-testid="stDialog"] h2 {{
+        font-family: 'HigherPixels', sans-serif !important;
+    }}
+ 
+    /* Mientras la ventana está abierta, la página de atrás no se desplaza */
+    body:has(div[data-testid="stDialog"]) [data-testid="stMain"],
+    body:has(div[data-testid="stDialog"]) [data-testid="stAppViewContainer"] {{
+        overflow: hidden !important;
+    }}
+
     </style>
     """,
 
@@ -252,9 +285,16 @@ TEMAS = {
     }
 }
 
-# 5. Pantalla de inicio
+# 5. Ventana de Logros
+@st.dialog("Logros", width="large")
+def ventana_logros():
+    st.caption("Contenido de prueba")
+    for i in range(1, 31):
+        st.markdown(f"Logro de prueba número {i}")
+
+# 6. Pantalla de inicio
 def pantalla_inicio():
-    st.markdown('<div class="logo"><span>Math II Training</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="logo"><span>Calc-Up</span></div>', unsafe_allow_html=True)
     st.markdown('<div class="subtitle">¡Bienvenido! Selecciona un tema para comenzar a practicar.</div>', unsafe_allow_html=True)
 
     izq, centro, der = st.columns([1, 2, 1], gap="large")
@@ -281,6 +321,11 @@ def pantalla_inicio():
             st.markdown("2. Empiezas en el nivel 1.")
             st.markdown("3. Al acumular aciertos, los ejercicios sube de nivel.")
             st.markdown("4. Si fallas, recibes una pista sobre tu error.")
+
+        c1, c2, c3, c4 = st.columns(4, gap="small")
+        with c1:
+            if st.button("🏆", key="btn_icono_logros", help="Logros"):
+                ventana_logros()
             
     with centro:
         st.markdown('<div class="etiqueta">¿Qué quieres practicar hoy?</div>', unsafe_allow_html=True)
@@ -322,7 +367,7 @@ def pantalla_inicio():
             st.markdown(r"2. Evalúa en $(2,1)$: $\nabla f(2,1)=(4,10)$")
             st.caption("Primero la expresión, luego el valor en el punto. Respondes cada paso.")
 
-# 6. Pantalla de tema
+# 7. Pantalla de tema
 def pantalla_tema(nombre):
     partida = st.session_state.partida
     with st.container(border=True, key="tarjeta_partida"):
@@ -403,7 +448,7 @@ def pantalla_resultados(partida):
 
     st.button("Jugar otra vez", on_click=elegir_tema, args=(partida["tema"],))
 
-# 7. Decidir que pantalla mostrar
+# 8. Decidir que pantalla mostrar
 if st.session_state.tema is None:
     pantalla_inicio()
 else:
